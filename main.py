@@ -4,9 +4,9 @@ import numpy as np
 
 class BaseConfig:
     METADATA_FORMAT: str = (
-        "<3sBBHHI"  # magic word; version; fps; width; height; frames count.
+        "<3sBBHHI64s"  # magic word; version; fps; width; height; frames count.
     )
-    CAV_VER = 0  # format version
+    CAV_VER = 1  # format version
 
     TARGET_WIDTH = 80  # fixed width of CAV file
     TARGET_COLORS = 10  # how much characters we have to display video
@@ -14,6 +14,17 @@ class BaseConfig:
 
 def main():
     Config = BaseConfig()
+
+    if len(sys.argv) == 2 and sys.argv[1] == "help":
+        print(f"""
+Console ASCII Video Converter
+Converts video to CAV v{Config.CAV_VER} format.
+Usage:
+uv run main.py "INPUT_VIDEO_PATH" "OUTPUT_DIRECTORY_PATH" "VIDEO_TITLE_OPTIONAL"
+
+Made by dersty
+""")
+        return
 
     if len(sys.argv) < 3:
         raise TypeError("Please specify original file path and new CAV file path!")
@@ -44,6 +55,11 @@ def main():
             width,
             height,
             frame_count,
+            (
+                (f"{sys.argv[3]:<64}").encode()
+                if len(sys.argv) > 3
+                else f"{'Unknown video':<64}".encode()
+            ),
         )
     )
 
@@ -57,7 +73,20 @@ def main():
             np.uint8
         )
 
-        cav_file.write(flat_frame)
+        change_indices = np.where(flat_frame[:-1] != flat_frame[1:])[0]
+        sub_sections = np.append(np.insert(change_indices + 1, 0, 0), len(flat_frame))
+
+        counts = np.diff(sub_sections)
+        values = flat_frame[sub_sections[:-1]]
+
+        encoded_frame = bytearray()
+        for count, value in zip(counts, values):
+            while count > 255:
+                encoded_frame.extend((255, value))
+                count -= 255
+            encoded_frame.extend((count, value))
+
+        cav_file.write(encoded_frame)
 
     cav_file.close()
     print(f"File converted at {to_path}")
