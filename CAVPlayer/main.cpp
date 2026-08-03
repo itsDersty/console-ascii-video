@@ -128,33 +128,6 @@ int main(int argc, char* argv[]) {
             Sleep(1000/metadata.fps);
         }
     }
-
-    /*
-    while (file.read(reinterpret_cast<char*>(buffer.data()), chunkSize) || file.gcount() > 0) {
-        streamsize bytesRead = file.gcount();
-
-        goToXY(0,0);
-        for (int i=0; i<metadata.height; ++i) {
-            size_t row_start = i*metadata.width;
-            
-            span<uint8_t> row(buffer.data()+row_start,metadata.width);
-
-            string row_string = "";
-            row_string.reserve(metadata.width);
-
-            for (uint8_t &c : row) {
-                row_string += CHARS[c];
-            }
-            cout << row_string << '\n';
-        }
-
-        const size_t current_second = current_frame/metadata.fps;
-        cout << current_second/60 <<":"<< current_second << " of " << video_length/60 <<":"<< video_length << " | "<<metadata.title;
-        
-        Sleep(1000/metadata.fps);
-        current_frame++;
-    }
-
-    */
+    
     return 0;
 }

@@ -20,7 +20,7 @@ def main():
 Console ASCII Video Converter
 Converts video to CAV v{Config.CAV_VER} format.
 Usage:
-uv run main.py "INPUT_VIDEO_PATH" "OUTPUT_DIRECTORY_PATH" "VIDEO_TITLE_OPTIONAL"
+python main.py "INPUT_VIDEO_PATH" "OUTPUT_DIRECTORY_PATH" "VIDEO_TITLE_OPTIONAL"
 
 Made by dersty
 """)
