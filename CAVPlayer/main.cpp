@@ -27,20 +27,6 @@ struct CavMetadata {
 };
 #pragma pack(pop)
 
-void setConsoleSize(int width, int height) {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hConsole == INVALID_HANDLE_VALUE) return;
-
-    SMALL_RECT minimalWindow = { 0, 0, 0, 0 };
-    SetConsoleWindowInfo(hConsole, TRUE, &minimalWindow);
-
-    COORD bufferSize = { (short)width, (short)height };
-    SetConsoleScreenBufferSize(hConsole, bufferSize);
-
-    SMALL_RECT windowSize = { 0, 0, (short)(width - 1), (short)(height - 1) };
-    SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
-}
-
 void goToXY(int x, int y) {
     COORD coord;
     coord.X = x;
@@ -66,7 +52,7 @@ int main(int argc, char* argv[]) {
     ifstream file(file_path, ios::binary);
 
     if (!file) {
-        cout << "Invalid file.";
+        cerr << "Invalid file.";
         return 1;
     }
 
@@ -74,16 +60,15 @@ int main(int argc, char* argv[]) {
     file.read(reinterpret_cast<char*>(&metadata), sizeof(metadata));
 
     if (metadata.version != CAV_VERSION) {
-        cout << "CAV v"<<metadata.version<<" is not supported. This player supports CAV v"<<CAV_VERSION<<".";
+        cerr << "CAV v"<<metadata.version<<" is not supported. This player supports CAV v"<<CAV_VERSION<<".";
         return 1;
     }
 
     if (metadata.magic[0]!='C' or metadata.magic[1]!='A' or metadata.magic[2]!='V') {
-        cout << "Please provide valid CAV file.";
+        cerr << "Please provide valid CAV file.";
         return 1;
     }
 
-    setConsoleSize(metadata.width,metadata.height+5);
     std::system("cls");
 
     const size_t video_length = metadata.frames/metadata.fps;
@@ -128,6 +113,6 @@ int main(int argc, char* argv[]) {
             Sleep(1000/metadata.fps);
         }
     }
-    
+
     return 0;
 }
