@@ -1,9 +1,10 @@
 # CAV video converter & player
 `.cav` is a basic console video format. It doesn't support audio.
+<img width="700" height="450" alt="cav player screenshot" src="https://github.com/user-attachments/assets/0b867c55-12cf-44d3-95c2-6f220e24607c" />
 
 The converter is written in Python, and the player is written in C++.
 
-### CAV file metadata struct (C/C++)
+### CAV file metadata struct
 Comments contain a short description and an example value.
 ```cpp
 struct CavMetadata {
@@ -26,6 +27,7 @@ main.py "original\video\path" "cav\file\folder" "optional video title"
 This script will create a CAV file with a random UUID name.
 
 ## Player Usage:
+The player currently supports Windows only.
 To watch a CAV video file, first compile the `main.cpp` file using the C++20 standard or higher.
 ```bash
 g++ main.cpp -o cavplayer.exe -std=c++26
