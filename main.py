@@ -33,10 +33,10 @@ Made by dersty
     to_path = f"{sys.argv[2]}/{uuid.uuid4()}.cav"
 
     video = cv2.VideoCapture(from_path)
-    if not video.isOpened:
+    if not video.isOpened():
         raise ValueError("Can't open the video!")
 
-    fps = int(video.get(cv2.CAP_PROP_FPS))
+    fps = int(round(video.get(cv2.CAP_PROP_FPS)))
     frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     orig_width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     orig_height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))

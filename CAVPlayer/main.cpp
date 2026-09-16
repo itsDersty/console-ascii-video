@@ -4,8 +4,6 @@
 #include <cstdint>
 #include <fstream>
 #include <windows.h>
-#include <vector>
-#include <span>
 #include <format>
 #include <cstdlib>
 
