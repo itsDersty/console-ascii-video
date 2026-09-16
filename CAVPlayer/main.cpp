@@ -41,7 +41,7 @@ string getTimeString(size_t rawSeconds) {
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        cout << "Please provide a file.";
+        cerr << "Please provide a file.";
         return 1;
     }
 
@@ -57,15 +57,25 @@ int main(int argc, char* argv[]) {
     CavMetadata metadata;
     file.read(reinterpret_cast<char*>(&metadata), sizeof(metadata));
 
+    if (metadata.magic[0]!='C' or metadata.magic[1]!='A' or metadata.magic[2]!='V') {
+        cerr << "Please provide a valid CAV file.";
+        return 1;
+    }
+
     if (metadata.version != CAV_VERSION) {
         cerr << "CAV v"<<metadata.version<<" is not supported. This player supports CAV v"<<CAV_VERSION<<".";
         return 1;
     }
 
-    if (metadata.magic[0]!='C' or metadata.magic[1]!='A' or metadata.magic[2]!='V') {
-        cerr << "Please provide valid CAV file.";
+    if (metadata.fps == 0) {
+        cerr << "Corrupted file: FPS can't be zero.";
         return 1;
     }
+
+    if (metadata.height == 0 || metadata.width == 0) {
+        cerr << "Corrupted file: Video height/width can't be zero.";
+    }
+
 
     std::system("cls");
 
