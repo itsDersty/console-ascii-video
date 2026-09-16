@@ -22,7 +22,7 @@ Converts video to CAV v{Config.CAV_VER} format.
 Usage:
 python main.py "INPUT_VIDEO_PATH" "OUTPUT_DIRECTORY_PATH" "VIDEO_TITLE_OPTIONAL"
 
-Made by dersty
+Made by dersty | GitHub: https://github.com/itsDersty/console-ascii-video
 """)
         return
 
@@ -45,50 +45,51 @@ Made by dersty
     ratio = orig_height / orig_width
     height = int(width * ratio * 0.5)
 
-    cav_file = open(to_path, "wb")
-    cav_file.write(
-        struct.pack(
-            Config.METADATA_FORMAT,
-            b"CAV",
-            Config.CAV_VER,
-            fps,
-            width,
-            height,
-            frame_count,
-            (
-                (f"{sys.argv[3]:<64}").encode()
-                if len(sys.argv) > 3
-                else f"{'Unknown video':<64}".encode()
-            ),
-        )
-    )
-
-    for i in range(frame_count):
-        success, frame = video.read()
-        if not success:
-            raise Exception("Something went wrong while reading the video!")
-
-        frame = cv2.cvtColor(cv2.resize(frame, (width, height)), cv2.COLOR_BGR2GRAY)
-        flat_frame = (frame.flatten() / 255 * (Config.TARGET_COLORS - 1)).astype(
-            np.uint8
+    with open(to_path, "wb") as cav_file:
+        cav_file.write(
+            struct.pack(
+                Config.METADATA_FORMAT,
+                b"CAV",
+                Config.CAV_VER,
+                fps,
+                width,
+                height,
+                frame_count,
+                (
+                    (f"{sys.argv[3]:<64}").encode()
+                    if len(sys.argv) > 3
+                    else f"{'Unknown video':<64}".encode()
+                ),
+            )
         )
 
-        change_indices = np.where(flat_frame[:-1] != flat_frame[1:])[0]
-        sub_sections = np.append(np.insert(change_indices + 1, 0, 0), len(flat_frame))
+        for i in range(frame_count):
+            success, frame = video.read()
+            if not success:
+                raise Exception("Something went wrong while reading the video!")
 
-        counts = np.diff(sub_sections)
-        values = flat_frame[sub_sections[:-1]]
+            frame = cv2.cvtColor(cv2.resize(frame, (width, height)), cv2.COLOR_BGR2GRAY)
+            flat_frame = (frame.flatten() / 255 * (Config.TARGET_COLORS - 1)).astype(
+                np.uint8
+            )
 
-        encoded_frame = bytearray()
-        for count, value in zip(counts, values):
-            while count > 255:
-                encoded_frame.extend((255, value))
-                count -= 255
-            encoded_frame.extend((count, value))
+            change_indices = np.where(flat_frame[:-1] != flat_frame[1:])[0]
+            sub_sections = np.append(
+                np.insert(change_indices + 1, 0, 0), len(flat_frame)
+            )
 
-        cav_file.write(encoded_frame)
+            counts = np.diff(sub_sections)
+            values = flat_frame[sub_sections[:-1]]
 
-    cav_file.close()
+            encoded_frame = bytearray()
+            for count, value in zip(counts, values):
+                while count > 255:
+                    encoded_frame.extend((255, value))
+                    count -= 255
+                encoded_frame.extend((count, value))
+
+            cav_file.write(encoded_frame)
+
     print(f"File converted at {to_path}")
 
 
