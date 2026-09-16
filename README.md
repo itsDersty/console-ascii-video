@@ -4,7 +4,7 @@
 
 The converter is written in Python, and the player is written in C++.
 
-### CAV file metadata struct (C/C++)
+### CAV file metadata struct
 Comments contain a short description and an example value.
 ```cpp
 struct CavMetadata {
